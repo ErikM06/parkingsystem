@@ -14,11 +14,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -60,10 +57,9 @@ public class ParkingDataBaseIT {
 	public void testParkingACar() {
 		ResultSet rs = null;
 		Connection con = null;
-		String id = null;
-		String requete = "SELECT `ID` FROM `test`.`ticket";
-		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-		parkingService.processIncomingVehicle();
+		String requete = "SELECT VEHICLE_REG_NUMBER FROM test.ticket";
+		String value2 = null;
+		String vehiculeReg = null;
 
 		try {
 			con = dataBaseTestConfig.getConnection();
@@ -76,12 +72,26 @@ public class ParkingDataBaseIT {
 		}
 
 		try {
+			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			parkingService.processIncomingVehicle();
 			Statement stmt = con.createStatement();
 			rs = stmt.executeQuery(requete);
-			int ticket = rs.getInt(id);
-			assert(ticket > 0);
+			value2 = inputReaderUtil.readVehicleRegistrationNumber();
+
+			while (rs !=null) {
+				vehiculeReg = rs.getNString(3);
+				if (vehiculeReg.equals(value2)) {
+					break;
+				}
+				rs.next();
+				}
+				assert (vehiculeReg.equals(value2));
+			
 
 		} catch (SQLException e) {
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 		// TODO: check that a ticket is actualy saved in DB and Parking table is updated
