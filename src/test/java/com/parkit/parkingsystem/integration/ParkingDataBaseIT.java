@@ -55,38 +55,25 @@ public class ParkingDataBaseIT {
 
 	@Test
 	public void testParkingACar() {
-		ResultSet rs = null;
-		Connection con = null;
-		String requete = "SELECT VEHICLE_REG_NUMBER FROM test.ticket";
+		
+		String requete = "SELECT * FROM ticket";
 		String value2 = null;
 		String vehiculeReg = null;
 
 		try {
-			con = dataBaseTestConfig.getConnection();
-		} catch (ClassNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		try {
+			Connection con = dataBaseTestConfig.getConnection();
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			parkingService.processIncomingVehicle();
 			Statement stmt = con.createStatement();
-			rs = stmt.executeQuery(requete);
+			ResultSet rs = stmt.executeQuery(requete);
 			value2 = inputReaderUtil.readVehicleRegistrationNumber();
-
-			while (rs !=null) {
-				vehiculeReg = rs.getNString(3);
+			vehiculeReg = rs.getNString(3);
+			while (rs.next()) {
 				if (vehiculeReg.equals(value2)) {
 					break;
 				}
-				rs.next();
-				}
-				assert (vehiculeReg.equals(value2));
-			
+			}
+			assert (vehiculeReg.equals(value2));
 
 		} catch (SQLException e) {
 		} catch (Exception e) {
