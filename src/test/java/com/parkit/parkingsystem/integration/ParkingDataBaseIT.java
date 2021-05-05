@@ -55,25 +55,33 @@ public class ParkingDataBaseIT {
 
 	@Test
 	public void testParkingACar() {
-		
-		String requete = "SELECT * FROM ticket";
-		String value2 = null;
-		String vehiculeReg = null;
+
+		Connection con = null;
+		String requete = "SELECT COUNT(ID) FROM ticket";
+		int getIdCountBeforeProcess = 0;
+		int getIdCountAfterProcess = 0;
 
 		try {
-			Connection con = dataBaseTestConfig.getConnection();
-			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-			parkingService.processIncomingVehicle();
+			con = dataBaseTestConfig.getConnection();
+
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(requete);
-			value2 = inputReaderUtil.readVehicleRegistrationNumber();
-			vehiculeReg = rs.getNString(3);
-			while (rs.next()) {
-				if (vehiculeReg.equals(value2)) {
-					break;
-				}
+
+			if (rs.next()) {
+				getIdCountBeforeProcess = rs.getInt(1);
 			}
-			assert (vehiculeReg.equals(value2));
+			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			parkingService.processIncomingVehicle();
+
+			Statement stmt2 = con.createStatement();
+			ResultSet rs2 = stmt.executeQuery(requete);
+
+			if (rs2.next()) {
+				getIdCountAfterProcess = rs2.getInt(1);
+			}
+			assert (getIdCountBeforeProcess == getIdCountAfterProcess);
+				
+		
 
 		} catch (SQLException e) {
 		} catch (Exception e) {
