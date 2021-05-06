@@ -21,6 +21,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
@@ -55,7 +56,7 @@ public class ParkingDataBaseIT {
 	}
 
 	@Test
-	public void testParkingACar() {
+	public void testParkingACar() { // problemes si plusieurs ticket?
 
 		Connection con = null;
 		String requete = "SELECT COUNT(id) FROM ticket UNION SELECT SUM(AVAILABLE) FROM parking";
@@ -69,11 +70,13 @@ public class ParkingDataBaseIT {
 
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(requete);
-
 			while (rs.next()) {
 				getIdAmountBeforeProcess = rs.getInt(1);
+				rs.next();
 				getAvailableSumBeforeProcess = rs.getInt(1);
+
 			}
+
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			parkingService.processIncomingVehicle();
 
@@ -81,10 +84,12 @@ public class ParkingDataBaseIT {
 
 			while (rs2.next()) {
 				getIdAmountAfterProcess = rs2.getInt(1);
+				rs2.next();
 				getAvailableSumAfterProcess = rs2.getInt(1);
+
 			}
 			assertTrue(getIdAmountAfterProcess > getIdAmountBeforeProcess
-					|| getAvailableSumAfterProcess < getAvailableSumBeforeProcess);
+					&& getAvailableSumAfterProcess < getAvailableSumBeforeProcess);
 
 		} catch (SQLException e) {
 		} catch (Exception e) {
@@ -97,10 +102,43 @@ public class ParkingDataBaseIT {
 	}
 
 	@Test
-	public void testParkingLotExit() {
-		testParkingACar();
-		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-		parkingService.processExitingVehicle();
+	public void testParkingLotExit() { // problemes si plusieurs ticket?
+		Connection con = null;
+		String requete = "SELECT PRICE FROM ticket UNION SELECT OUT_TIME FROM ticket";
+		Double previousTicketFare = null;
+		Double thisTicketFare = null;
+		Timestamp previousOutTime = null;
+		Timestamp thisOutTime = null;
+
+		try {
+			con = dataBaseTestConfig.getConnection();
+
+			testParkingACar();
+
+			Statement stmt = con.createStatement();
+			ResultSet rs = stmt.executeQuery(requete);
+
+			while (rs.next()) {
+				previousTicketFare = rs.getDouble(1);
+				rs.next();
+				previousOutTime = rs.getTimestamp(1);
+			}
+
+			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			parkingService.processExitingVehicle();
+			ResultSet rsExitCar = stmt.executeQuery(requete);
+
+			while (rsExitCar.next()) {
+				thisTicketFare = rsExitCar.getDouble(1);
+				rsExitCar.next();
+				thisOutTime = rsExitCar.getTimestamp(1);
+
+			}
+			assertTrue(previousTicketFare != thisTicketFare && previousOutTime != thisOutTime);
+
+		} catch (SQLException e) {
+		} catch (Exception e) {
+		}
 		// TODO: check that the fare generated and out time are populated correctly in
 		// the database
 	}
