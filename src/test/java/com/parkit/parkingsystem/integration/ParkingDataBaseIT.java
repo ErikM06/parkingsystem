@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
@@ -57,9 +58,11 @@ public class ParkingDataBaseIT {
 	public void testParkingACar() {
 
 		Connection con = null;
-		String requete = "SELECT COUNT(ID) FROM ticket";
-		int getIdCountBeforeProcess = 0;
-		int getIdCountAfterProcess = 0;
+		String requete = "SELECT COUNT(id) FROM ticket UNION SELECT SUM(AVAILABLE) FROM parking";
+		int getIdAmountBeforeProcess = 0;
+		int getIdAmountAfterProcess = 0;
+		int getAvailableSumBeforeProcess = 0;
+		int getAvailableSumAfterProcess = 0;
 
 		try {
 			con = dataBaseTestConfig.getConnection();
@@ -67,21 +70,21 @@ public class ParkingDataBaseIT {
 			Statement stmt = con.createStatement();
 			ResultSet rs = stmt.executeQuery(requete);
 
-			if (rs.next()) {
-				getIdCountBeforeProcess = rs.getInt(1);
+			while (rs.next()) {
+				getIdAmountBeforeProcess = rs.getInt(1);
+				getAvailableSumBeforeProcess = rs.getInt(1);
 			}
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			parkingService.processIncomingVehicle();
 
-			Statement stmt2 = con.createStatement();
 			ResultSet rs2 = stmt.executeQuery(requete);
 
-			if (rs2.next()) {
-				getIdCountAfterProcess = rs2.getInt(1);
+			while (rs2.next()) {
+				getIdAmountAfterProcess = rs2.getInt(1);
+				getAvailableSumAfterProcess = rs2.getInt(1);
 			}
-			assert (getIdCountBeforeProcess == getIdCountAfterProcess);
-				
-		
+			assertTrue(getIdAmountAfterProcess > getIdAmountBeforeProcess
+					|| getAvailableSumAfterProcess < getAvailableSumBeforeProcess);
 
 		} catch (SQLException e) {
 		} catch (Exception e) {
