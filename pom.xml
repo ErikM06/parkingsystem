@@ -99,9 +99,10 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
+                    <includes>
+                        <include>**/*IT.java</include>
+                        <include>**/*Test.java</include>
+                    </includes>
                 </configuration>
                 <executions>
                     <execution>
