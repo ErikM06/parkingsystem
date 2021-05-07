@@ -56,7 +56,7 @@ public class ParkingDataBaseIT {
 	}
 
 	@Test
-	public void testParkingACar() { // problemes si plusieurs ticket?
+	public void testParkingACar() {
 
 		Connection con = null;
 		String requete = "SELECT COUNT(id) FROM ticket UNION SELECT SUM(AVAILABLE) FROM parking";
@@ -104,10 +104,9 @@ public class ParkingDataBaseIT {
 	@Test
 	public void testParkingLotExit() { // problemes si plusieurs ticket?
 		Connection con = null;
-		String requete = "SELECT PRICE FROM ticket UNION SELECT OUT_TIME FROM ticket";
+		String priceRequete = "SELECT OUT_TIME FROM ticket UNION SELECT PRICE FROM ticket ORDER BY OUT_TIME DESC LIMIT 2";
 		Double previousTicketFare = null;
 		Double thisTicketFare = null;
-		Timestamp previousOutTime = null;
 		Timestamp thisOutTime = null;
 
 		try {
@@ -116,25 +115,26 @@ public class ParkingDataBaseIT {
 			testParkingACar();
 
 			Statement stmt = con.createStatement();
-			ResultSet rs = stmt.executeQuery(requete);
+			ResultSet rs = stmt.executeQuery(priceRequete);
 
-			while (rs.next()) {
+			if (rs != null) {
+				rs.absolute(1);
 				previousTicketFare = rs.getDouble(1);
-				rs.next();
-				previousOutTime = rs.getTimestamp(1);
 			}
 
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			parkingService.processExitingVehicle();
-			ResultSet rsExitCar = stmt.executeQuery(requete);
 
-			while (rsExitCar.next()) {
-				thisTicketFare = rsExitCar.getDouble(1);
-				rsExitCar.next();
-				thisOutTime = rsExitCar.getTimestamp(1);
+			stmt = con.createStatement();
+			ResultSet rsNewTicket = stmt.executeQuery(priceRequete);
 
+			if (rsNewTicket != null) {
+				rsNewTicket.absolute(1);
+				thisOutTime = rsNewTicket.getTimestamp(1);
+				rsNewTicket.next();
+				thisTicketFare = rsNewTicket.getDouble(1);
 			}
-			assertTrue(previousTicketFare != thisTicketFare && previousOutTime != thisOutTime);
+			assertTrue(previousTicketFare != thisTicketFare && thisOutTime != null);
 
 		} catch (SQLException e) {
 		} catch (Exception e) {
