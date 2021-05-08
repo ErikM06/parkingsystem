@@ -135,7 +135,7 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertTrue(ticket.getPrice() == 0.0);	
+        assertTrue(ticket.getPrice() == Fare.FREE_FARE);	
     }
     
     @Test
@@ -148,7 +148,7 @@ public class FareCalculatorServiceTest {
         ticket.setOutTime(outTime);
         ticket.setParkingSpot(parkingSpot);
         fareCalculatorService.calculateFare(ticket);
-        assertTrue(ticket.getPrice() == 0.0);	
+        assertTrue(ticket.getPrice() == Fare.FREE_FARE);	
     }
 
 }
