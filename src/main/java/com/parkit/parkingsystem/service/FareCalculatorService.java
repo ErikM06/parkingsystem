@@ -17,28 +17,31 @@ public class FareCalculatorService {
 
 		// TODO: Some tests are failing here. Need to check if this logic is correct
 		double duration = ((outTime.getTime() - inTime.getTime()) / ((double) 60 * 60 * 1000));
-		double freeFareDuration = (30 * 60 * 1000) / (60 * 60 * 1000);
-		double freeFare = 0.0;
+		double freeFareDuration = (double)( 30 * 60 * 1000) / (60 * 60 * 1000);
+		
 		// 30min free feature (If 30minOrLess>free else switch)
 		
 		switch (ticket.getParkingSpot().getParkingType()) {
 		case CAR: {
 			if (duration <= freeFareDuration) {
-				ticket.setPrice(freeFare);	
+				ticket.setPrice(Fare.FREE_FARE);	
+				break;
 			} else if (duration > freeFareDuration) { 
 				ticket.setPrice(duration * Fare.CAR_RATE_PER_HOUR);
+				break;
 			}
-			break;
+			
 			
 		}
 		case BIKE: {
 			if (duration <= freeFareDuration) {
-				ticket.setPrice(freeFare);
+				ticket.setPrice(Fare.FREE_FARE);
+				break;
 			} else if (duration > freeFareDuration) { 
 				ticket.setPrice(duration * Fare.BIKE_RATE_PER_HOUR);	
+				break;
 			}
-			break;
-			
+		
 		}
 		default:
 			throw new IllegalArgumentException("Unkown Parking Type");
