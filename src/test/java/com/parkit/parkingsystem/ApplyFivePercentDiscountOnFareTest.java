@@ -35,6 +35,7 @@ public class ApplyFivePercentDiscountOnFareTest {
 	private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
 	private static ParkingSpotDAO parkingSpotDAO;
 	private static TicketDAO ticketDAO;
+	private static Ticket ticket;
 	private static DataBasePrepareService dataBasePrepareService;
 
 	@Mock
@@ -58,7 +59,7 @@ public class ApplyFivePercentDiscountOnFareTest {
 		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 		parkingService.processIncomingVehicle();
 		parkingService.processExitingVehicle();
-		
+
 	}
 
 	@AfterAll
@@ -72,8 +73,6 @@ public class ApplyFivePercentDiscountOnFareTest {
 		ResultSet rs = null;
 		String readerRegNumber = null;
 		String canGetTheDiscount = null;
-		double priceWithoutDiscount = 0;
-		double priceWithDiscount = 0;
 
 		try {
 			con = dataBaseTestConfig.getConnection();
@@ -90,16 +89,35 @@ public class ApplyFivePercentDiscountOnFareTest {
 			if (rs.next()) {
 				canGetTheDiscount = rs.getString(1);
 			}
+			
+			assertTrue(canGetTheDiscount.equals(readerRegNumber));
+			System.out.println(
+					"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
 
-			if (canGetTheDiscount.equals(readerRegNumber)) {
-				System.out.println(
-						"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
-				Ticket ticket = new Ticket();
-				priceWithoutDiscount = ticket.getPrice();
-				priceWithDiscount = (priceWithoutDiscount) * (5 / 100);
-				ticket.setPrice(priceWithDiscount);
-			}
+		} catch (SQLException e) {
 
+		} catch (Exception e) {
+
+		}
+
+	}
+
+	@Test
+	public void applyFivePercentDiscount() {
+		Connection con = null;
+		double priceWithoutDiscount = 0;
+		double priceWithDiscount = 0;
+
+		try {
+			con = dataBaseTestConfig.getConnection();
+			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			ticket = new Ticket();
+			
+			checkRightsForFivePercentDiscount();
+		
+			priceWithoutDiscount = ticket.getPrice();
+			priceWithDiscount = (priceWithoutDiscount) * (5 / 100);
+			ticket.setPrice(priceWithDiscount);
 			parkingService.processExitingVehicle();
 
 			assertTrue(priceWithDiscount > 0);
