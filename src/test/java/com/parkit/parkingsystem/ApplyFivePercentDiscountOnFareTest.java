@@ -5,10 +5,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
-import com.parkit.parkingsystem.integration.ParkingDataBaseIT;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.Ticket;
+import com.parkit.parkingsystem.service.ApplyFivePercentDiscountOnFare;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
@@ -16,10 +16,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -27,7 +24,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 @ExtendWith(MockitoExtension.class)
 public class ApplyFivePercentDiscountOnFareTest {
@@ -68,7 +64,7 @@ public class ApplyFivePercentDiscountOnFareTest {
 	}
 
 	@Test
-	public void checkRightsForFivePercentDiscount() {
+	public void checkRightsForFivePercentDiscountTest() {
 		Connection con = null;
 		ResultSet rs = null;
 		String readerRegNumber = null;
@@ -103,7 +99,7 @@ public class ApplyFivePercentDiscountOnFareTest {
 	}
 
 	@Test
-	public void applyFivePercentDiscount() {
+	public void applyFivePercentDiscountTest() {
 		Connection con = null;
 		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
@@ -111,16 +107,16 @@ public class ApplyFivePercentDiscountOnFareTest {
 		try {
 			con = dataBaseTestConfig.getConnection();
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			ApplyFivePercentDiscountOnFare applyFivePercentDiscountOnFare = new ApplyFivePercentDiscountOnFare();
 			ticket = new Ticket();
 			
-			checkRightsForFivePercentDiscount();
-		
-			priceWithoutDiscount = ticket.getPrice();
-			priceWithDiscount = (priceWithoutDiscount) * (5 / 100);
-			ticket.setPrice(priceWithDiscount);
+			checkRightsForFivePercentDiscountTest();
+			
+			
+			applyFivePercentDiscountOnFare.checkRightForFivePercentDiscount();
 			parkingService.processExitingVehicle();
 
-			assertTrue(priceWithDiscount > 0);
+			assertTrue(priceWithDiscount == ticket.getPrice());
 
 		} catch (SQLException e) {
 
