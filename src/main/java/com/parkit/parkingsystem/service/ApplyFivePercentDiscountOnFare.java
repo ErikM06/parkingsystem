@@ -12,24 +12,23 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 
 public class ApplyFivePercentDiscountOnFare {
 
-	private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
 
 	private InputReaderUtil inputReaderUtil;
 	private ParkingSpotDAO parkingSpotDAO;
 	private TicketDAO ticketDAO;
-	private Ticket ticket;
-	private DataBaseConfig dataBaseConfig;
+	private Ticket _ticket = new Ticket();
+	private DataBaseConfig _dataBaseConfig = new DataBaseConfig();
 
-	public boolean checkRightForFivePercentDiscount() {
+	public void checkRightForFivePercentDiscount() {
 		Connection con = null;
 		ResultSet rs = null;
 		String readerRegNumber = null;
 		String canGetTheDiscount = null;
 		Boolean discount = null;
-		
+
 		try {
-			con = dataBaseConfig.getConnection();
-			readerRegNumber = ticket.getVehicleRegNumber();
+			con = _dataBaseConfig.getConnection();
+			readerRegNumber = _ticket.getVehicleRegNumber();
 
 			PreparedStatement ps = con.prepareStatement(
 					"SELECT VEHICLE_REG_NUMBER FROM ticket WHERE VEHICLE_REG_NUMBER = ? AND OUT_TIME IS NOT NULL");
@@ -37,30 +36,41 @@ public class ApplyFivePercentDiscountOnFare {
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				canGetTheDiscount = rs.getString(1);
+				System.out.println(canGetTheDiscount);
 			}
-			if(canGetTheDiscount == readerRegNumber) {
+			if (canGetTheDiscount.equals(readerRegNumber)) {
 				discount = true;
+				_ticket.setCanGetDiscount(discount);
 				System.out.println(
 						"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
-			} else { discount = false ;
+				
+
+			} else {
+				discount = false;
+				_ticket.setCanGetDiscount(discount);
+				
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return discount;
+		
 
 	}
-	public void applyFivePercentDiscount(Ticket ticket) {
+
+	public void applyFivePercentDiscount() {
 		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
+		Boolean applyDiscount;
 		
-		if(checkRightForFivePercentDiscount()) {
-			priceWithoutDiscount = ticket.getPrice();
-			priceWithDiscount = priceWithoutDiscount *(5/100);
-			ticket.setPrice(priceWithDiscount);
+		applyDiscount = _ticket.canGetDiscount();
+		if (applyDiscount == true) {
+			priceWithoutDiscount = _ticket.getPrice();
+			priceWithDiscount = priceWithoutDiscount * (5 / 100);
+			_ticket.setPrice(priceWithDiscount);
+		} else {
+			_ticket.getPrice();
 		}
-		
-		
+
 	}
 }

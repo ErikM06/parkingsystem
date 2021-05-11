@@ -10,6 +10,7 @@ public class Ticket {
     private double price;
     private Date inTime;
     private Date outTime;
+    private Boolean discount;
 
     public int getId() {
         return id;
@@ -57,5 +58,11 @@ public class Ticket {
 
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
+    }
+    public Boolean canGetDiscount() {
+    	return discount;
+    }
+    public void setCanGetDiscount(Boolean discount) {
+     	this.discount = discount;
     }
 }
