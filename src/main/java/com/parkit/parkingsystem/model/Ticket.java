@@ -59,10 +59,10 @@ public class Ticket {
     public void setOutTime(Date outTime) {
         this.outTime = outTime;
     }
-    public Boolean canGetDiscount() {
+    public Boolean getDiscount() {
     	return discount;
     }
-    public void setCanGetDiscount(Boolean discount) {
+    public void setGetDiscount(Boolean discount) {
      	this.discount = discount;
     }
 }

@@ -109,8 +109,8 @@ public class ApplyFivePercentDiscountOnFareTest {
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			ApplyFivePercentDiscountOnFare applyFivePercentDiscountOnFare = new ApplyFivePercentDiscountOnFare();
 			
-			ticket.setCanGetDiscount(discount);
-			applyFivePercentDiscountOnFare.applyFivePercentDiscount();
+			ticket.setGetDiscount(discount);
+			applyFivePercentDiscountOnFare.applyFivePercentDiscount(ticket);
 				
 			parkingService.processExitingVehicle();
 

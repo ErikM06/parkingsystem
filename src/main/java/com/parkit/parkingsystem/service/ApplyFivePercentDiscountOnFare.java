@@ -12,14 +12,12 @@ import com.parkit.parkingsystem.util.InputReaderUtil;
 
 public class ApplyFivePercentDiscountOnFare {
 
-
-	private InputReaderUtil inputReaderUtil;
+	private InputReaderUtil _inputReaderUtil = new InputReaderUtil();
 	private ParkingSpotDAO parkingSpotDAO;
-	private TicketDAO ticketDAO;
-	private Ticket _ticket = new Ticket();
+
 	private DataBaseConfig _dataBaseConfig = new DataBaseConfig();
 
-	public void checkRightForFivePercentDiscount() {
+	public void checkRightForFivePercentDiscount(Ticket ticket) {
 		Connection con = null;
 		ResultSet rs = null;
 		String readerRegNumber = null;
@@ -28,48 +26,48 @@ public class ApplyFivePercentDiscountOnFare {
 
 		try {
 			con = _dataBaseConfig.getConnection();
-			readerRegNumber = _ticket.getVehicleRegNumber();
+
+			readerRegNumber = ticket.getVehicleRegNumber();
 
 			PreparedStatement ps = con.prepareStatement(
-					"SELECT VEHICLE_REG_NUMBER FROM ticket WHERE VEHICLE_REG_NUMBER = ? AND OUT_TIME IS NOT NULL");
+					"SELECT VEHICLE_REG_NUMBER FROM prod.ticket WHERE VEHICLE_REG_NUMBER = ? AND OUT_TIME IS NOT NULL LIMIT 1");
 			ps.setString(1, readerRegNumber);
 			rs = ps.executeQuery();
-			if (rs.next()) {
+			while (rs.next()) {
 				canGetTheDiscount = rs.getString(1);
-				System.out.println(canGetTheDiscount);
-			}
-			if (canGetTheDiscount.equals(readerRegNumber)) {
-				discount = true;
-				_ticket.setCanGetDiscount(discount);
-				System.out.println(
-						"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
-				
-
-			} else {
-				discount = false;
-				_ticket.setCanGetDiscount(discount);
-				
 			}
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 
+		}
+		if (canGetTheDiscount.equals(readerRegNumber)) {
+			discount = true;
+			ticket.setGetDiscount(discount);
+			System.out.println(
+					"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
+		} else {
+			discount = false;
+			ticket.setGetDiscount(discount);
+
+		}
+		_dataBaseConfig.closeConnection(con);
 	}
 
-	public void applyFivePercentDiscount() {
+	public void applyFivePercentDiscount(Ticket ticket) {
 		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
 		Boolean applyDiscount;
-		
-		applyDiscount = _ticket.canGetDiscount();
-		if (applyDiscount == true) {
-			priceWithoutDiscount = _ticket.getPrice();
-			priceWithDiscount = priceWithoutDiscount * (5 / 100);
-			_ticket.setPrice(priceWithDiscount);
-		} else {
-			_ticket.getPrice();
+
+		applyDiscount = ticket.getDiscount();
+		while (applyDiscount.booleanValue()) {
+			if (applyDiscount == true) {
+				priceWithoutDiscount = ticket.getPrice();
+				System.out.println("Price without discount is" + priceWithoutDiscount);
+				priceWithDiscount = priceWithoutDiscount * (5 / 100);
+				System.out.println("Price with discount is" + priceWithDiscount);
+				ticket.setPrice(priceWithDiscount);
+			} else {
+				ticket.getPrice();
+			}
 		}
 
 	}
