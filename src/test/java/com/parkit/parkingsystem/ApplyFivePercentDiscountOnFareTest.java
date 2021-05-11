@@ -74,7 +74,6 @@ public class ApplyFivePercentDiscountOnFareTest {
 			con = dataBaseTestConfig.getConnection();
 
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
 			parkingService.processIncomingVehicle();
 
 			readerRegNumber = inputReaderUtil.readVehicleRegistrationNumber();
@@ -103,17 +102,16 @@ public class ApplyFivePercentDiscountOnFareTest {
 		Connection con = null;
 		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
-
+		boolean discount = true;
 		try {
 			con = dataBaseTestConfig.getConnection();
+			
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			ApplyFivePercentDiscountOnFare applyFivePercentDiscountOnFare = new ApplyFivePercentDiscountOnFare();
-			ticket = new Ticket();
 			
-			checkRightsForFivePercentDiscountTest();
-			
-			
-			applyFivePercentDiscountOnFare.checkRightForFivePercentDiscount();
+			ticket.setCanGetDiscount(discount);
+			applyFivePercentDiscountOnFare.applyFivePercentDiscount();
+				
 			parkingService.processExitingVehicle();
 
 			assertTrue(priceWithDiscount == ticket.getPrice());
