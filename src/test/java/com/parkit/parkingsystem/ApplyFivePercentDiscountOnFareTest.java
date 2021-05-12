@@ -99,12 +99,10 @@ public class ApplyFivePercentDiscountOnFareTest {
 
 	@Test
 	public void applyFivePercentDiscountTest() {
-		Connection con = null;
-		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
-		boolean discount = true;
+		int discount = 0;
 		try {
-			con = dataBaseTestConfig.getConnection();
+			dataBaseTestConfig.getConnection();
 			
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 			ApplyFivePercentDiscountOnFare applyFivePercentDiscountOnFare = new ApplyFivePercentDiscountOnFare();
