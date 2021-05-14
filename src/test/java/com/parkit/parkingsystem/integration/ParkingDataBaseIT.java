@@ -134,7 +134,7 @@ public class ParkingDataBaseIT {
 				rsNewTicket.next();
 				thisTicketFare = rsNewTicket.getDouble(1);
 			}
-			assertTrue(previousTicketFare != thisTicketFare && thisOutTime != null);
+			assertFalse(previousTicketFare.equals(thisTicketFare)  && thisOutTime.equals(null));
 
 		} catch (SQLException e) {
 		} catch (Exception e) {

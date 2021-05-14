@@ -68,7 +68,7 @@ public class DiscountServiceForRecurentUserTest {
 	public void checkRightsForFivePercentDiscountTest() {
 		Connection con = null;
 		ResultSet rs = null;
-		String readerRegNumber = null;
+		String readerRegNumber;
 		String canGetTheDiscount = null;
 
 		try {
