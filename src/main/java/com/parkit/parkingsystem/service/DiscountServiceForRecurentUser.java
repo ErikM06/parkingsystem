@@ -7,7 +7,7 @@ import java.sql.ResultSet;
 import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.model.Ticket;
 
-public class ApplyFivePercentDiscountOnFare {
+public class DiscountServiceForRecurentUser {
 
 	private DataBaseConfig _dataBaseConfig = new DataBaseConfig();
 

@@ -8,7 +8,8 @@ import com.parkit.parkingsystem.dao.TicketDAO;
 import com.parkit.parkingsystem.integration.config.DataBaseTestConfig;
 import com.parkit.parkingsystem.integration.service.DataBasePrepareService;
 import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.service.ApplyFivePercentDiscountOnFare;
+import com.parkit.parkingsystem.service.DiscountServiceForRecurentUser;
+import com.parkit.parkingsystem.service.FareCalculatorService;
 import com.parkit.parkingsystem.service.ParkingService;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 
@@ -24,27 +25,25 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 @ExtendWith(MockitoExtension.class)
-public class ApplyFivePercentDiscountOnFareTest {
+public class DiscountServiceForRecurentUserTest {
 
 	private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
 	private static ParkingSpotDAO parkingSpotDAO;
 	private static TicketDAO ticketDAO;
-	private static Ticket ticket;
 	private static DataBasePrepareService dataBasePrepareService;
-
 	@Mock
 	private static InputReaderUtil inputReaderUtil;
 
 	@BeforeAll
 	private static void setUp() throws Exception {
 		parkingSpotDAO = new ParkingSpotDAO();
+		new DiscountServiceForRecurentUser();
 		parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
 		ticketDAO = new TicketDAO();
 		ticketDAO.dataBaseConfig = dataBaseTestConfig;
-		dataBasePrepareService = new DataBasePrepareService();
-		dataBasePrepareService.clearDataBaseEntries();
 
 	}
 
@@ -52,6 +51,8 @@ public class ApplyFivePercentDiscountOnFareTest {
 	private void prepareDB() throws Exception {
 		when(inputReaderUtil.readSelection()).thenReturn(1);
 		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCD");
+		dataBasePrepareService = new DataBasePrepareService();
+		dataBasePrepareService.clearDataBaseEntries();
 		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 		parkingService.processIncomingVehicle();
 		parkingService.processExitingVehicle();
@@ -84,7 +85,7 @@ public class ApplyFivePercentDiscountOnFareTest {
 			if (rs.next()) {
 				canGetTheDiscount = rs.getString(1);
 			}
-			
+
 			assertTrue(canGetTheDiscount.equals(readerRegNumber));
 			System.out.println(
 					"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
@@ -99,20 +100,30 @@ public class ApplyFivePercentDiscountOnFareTest {
 
 	@Test
 	public void applyFivePercentDiscountTest() {
+		Connection con = null;
+		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
-		int discount = 0;
+		String regNumber = null;
+		int discount = 1;
 		try {
-			dataBaseTestConfig.getConnection();
-			
-			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-			ApplyFivePercentDiscountOnFare applyFivePercentDiscountOnFare = new ApplyFivePercentDiscountOnFare();
-			
-			ticket.setGetDiscount(discount);
-			applyFivePercentDiscountOnFare.applyFivePercentDiscount(ticket);
-				
-			parkingService.processExitingVehicle();
+			con = dataBaseTestConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement("UPDATE test.ticket SET DISCOUNT = ?, OUT_TIME = ? WHERE ID=1");
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			FareCalculatorService fareCalculatorService = new FareCalculatorService();
+			ps.setInt(1, discount);
+			ps.setTimestamp(2, timestamp);
 
+			ParkingService _parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			regNumber = inputReaderUtil.readVehicleRegistrationNumber();
+			ps.executeUpdate();
+			Ticket ticket = ticketDAO.getTicket(regNumber);
+			fareCalculatorService.calculateFare(ticket);
+			priceWithoutDiscount = ticket.getPrice();
+			priceWithDiscount = (ticket.getPrice() - ((priceWithoutDiscount * 5) / 100));
 			assertTrue(priceWithDiscount == ticket.getPrice());
+			_parkingService.processExitingVehicle();
+
+			
 
 		} catch (SQLException e) {
 

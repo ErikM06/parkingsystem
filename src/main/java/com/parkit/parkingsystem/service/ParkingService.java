@@ -20,13 +20,13 @@ public class ParkingService {
 	private InputReaderUtil inputReaderUtil;
 	private ParkingSpotDAO parkingSpotDAO;
 	private TicketDAO ticketDAO;
-	private ApplyFivePercentDiscountOnFare applyFivePercentDiscountOnFare;
+	private DiscountServiceForRecurentUser applyFivePercentDiscountOnFare;
 
 	public ParkingService(InputReaderUtil inputReaderUtil, ParkingSpotDAO parkingSpotDAO, TicketDAO ticketDAO) {
 		this.inputReaderUtil = inputReaderUtil;
 		this.parkingSpotDAO = parkingSpotDAO;
 		this.ticketDAO = ticketDAO;
-		this.applyFivePercentDiscountOnFare = new ApplyFivePercentDiscountOnFare();
+		this.applyFivePercentDiscountOnFare = new DiscountServiceForRecurentUser();
 	}
 
 	public void processIncomingVehicle() {
