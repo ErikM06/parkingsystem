@@ -108,20 +108,21 @@ public class DiscountServiceForRecurentUserTest {
 		try {
 			con = dataBaseTestConfig.getConnection();
 			PreparedStatement ps = con.prepareStatement("UPDATE test.ticket SET DISCOUNT = ?, OUT_TIME = ? WHERE ID=1");
+			
 			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-			FareCalculatorService fareCalculatorService = new FareCalculatorService();
+			Ticket ticket = new Ticket();
 			ps.setInt(1, discount);
 			ps.setTimestamp(2, timestamp);
-
+			DiscountServiceForRecurentUser discountServiceForRecurrentUser = new DiscountServiceForRecurentUser();
 			ParkingService _parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+		
 			regNumber = inputReaderUtil.readVehicleRegistrationNumber();
 			ps.executeUpdate();
-			Ticket ticket = ticketDAO.getTicket(regNumber);
-			fareCalculatorService.calculateFare(ticket);
-			priceWithoutDiscount = ticket.getPrice();
-			priceWithDiscount = (ticket.getPrice() - ((priceWithoutDiscount * 5) / 100));
-			assertTrue(priceWithDiscount == ticket.getPrice());
-			_parkingService.processExitingVehicle();
+			
+			ticket = ticketDAO.getTicket(regNumber);
+			discountServiceForRecurrentUser.applyFivePercentDiscount(ticket);
+		
+			assertTrue(priceWithDiscount == (priceWithoutDiscount*0.05));
 
 			
 
