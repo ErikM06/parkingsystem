@@ -120,9 +120,11 @@ public class DiscountServiceForRecurentUserTest {
 			ps.executeUpdate();
 			
 			ticket = ticketDAO.getTicket(regNumber);
+			priceWithoutDiscount = ticket.getPrice();
 			discountServiceForRecurrentUser.applyFivePercentDiscount(ticket);
+			priceWithDiscount = ticket.getPrice();
 		
-			assertTrue(priceWithDiscount == (priceWithoutDiscount*0.05));
+			assertTrue(priceWithDiscount == priceWithoutDiscount-(priceWithoutDiscount*0.05));
 
 			
 
