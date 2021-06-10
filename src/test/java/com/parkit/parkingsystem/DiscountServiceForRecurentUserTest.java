@@ -129,7 +129,7 @@ public class DiscountServiceForRecurentUserTest {
 			discountServiceForRecurrentUser.applyFivePercentDiscount(ticket);
 			priceWithDiscount = ticket.getPrice();
 		
-			assertTrue(priceWithDiscount == priceWithoutDiscount-(priceWithoutDiscount*0.05));
+			assertTrue(priceWithDiscount == priceWithoutDiscount-((priceWithoutDiscount * 5) / 100));
 
 			
 
