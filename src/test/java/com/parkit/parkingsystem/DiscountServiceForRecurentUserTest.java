@@ -75,20 +75,25 @@ public class DiscountServiceForRecurentUserTest {
 			con = dataBaseTestConfig.getConnection();
 
 			ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+			DiscountServiceForRecurentUser discountService = new  DiscountServiceForRecurentUser();
+			Ticket ticket = new Ticket();
 			parkingService.processIncomingVehicle();
-
+			
 			readerRegNumber = inputReaderUtil.readVehicleRegistrationNumber();
+			
+			
 			PreparedStatement ps = con.prepareStatement(
 					"SELECT VEHICLE_REG_NUMBER FROM ticket WHERE VEHICLE_REG_NUMBER = ? AND OUT_TIME IS NOT NULL");
 			ps.setString(1, readerRegNumber);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				canGetTheDiscount = rs.getString(1);
+				ticket.setVehicleRegNumber(canGetTheDiscount);
 			}
-
-			assertTrue(canGetTheDiscount.equals(readerRegNumber));
-			System.out.println(
-					"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
+			discountService.checkRightForFivePercentDiscount(ticket);
+			String ticketReg = ticket.getVehicleRegNumber();
+			assertTrue(ticketReg.equals(readerRegNumber));
+		
 
 		} catch (SQLException e) {
 
