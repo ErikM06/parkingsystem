@@ -102,11 +102,11 @@ public class ParkingDataBaseIT {
 	}
 
 	@Test
-	public void testParkingLotExit() { // problemes si plusieurs ticket?
+	public void testParkingLotExit() { 
 		Connection con = null;
 		String priceRequete = "SELECT OUT_TIME FROM ticket UNION SELECT PRICE FROM ticket ORDER BY OUT_TIME DESC LIMIT 2";
-		Double previousTicketFare = null;
-		Double thisTicketFare = null;
+		double previousTicketFare = 0;
+		double thisTicketFare = 0;
 		Timestamp thisOutTime = null;
 
 		try {
@@ -134,7 +134,7 @@ public class ParkingDataBaseIT {
 				rsNewTicket.next();
 				thisTicketFare = rsNewTicket.getDouble(1);
 			}
-			assertFalse(previousTicketFare.equals(thisTicketFare)  && thisOutTime.equals(null));
+			assertFalse(previousTicketFare == thisTicketFare || thisOutTime.equals(null));
 
 		} catch (SQLException e) {
 		} catch (Exception e) {
