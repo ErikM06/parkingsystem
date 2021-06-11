@@ -106,8 +106,8 @@ public class DiscountServiceForRecurentUserTest {
 	@Test
 	public void applyFivePercentDiscountTest() {
 		Connection con = null;
-		double priceWithoutDiscount = 0;
-		double priceWithDiscount = 0;
+		Double priceWithoutDiscount = 0.0;
+		Double priceWithDiscount = 0.0;
 		String regNumber = null;
 		int discount = 1;
 		try {
@@ -129,7 +129,7 @@ public class DiscountServiceForRecurentUserTest {
 			discountServiceForRecurrentUser.applyFivePercentDiscount(ticket);
 			priceWithDiscount = ticket.getPrice();
 		
-			assertTrue(priceWithDiscount == priceWithoutDiscount-((priceWithoutDiscount * 5) / 100));
+			assertTrue(priceWithDiscount.equals(priceWithoutDiscount-((priceWithoutDiscount * 5) / 100)));
 
 			
 
