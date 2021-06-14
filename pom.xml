@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.parkit</groupId>
 	<artifactId>parking-system</artifactId>
@@ -9,19 +10,17 @@
 	<packaging>jar</packaging>
 
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-         
-         
-         <sonar.projectKey>ErikM06_parkingsystem</sonar.projectKey>
-         <sonar.organization>erikm06</sonar.organization>
-        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 
-    </properties>
-         
 
+		<sonar.projectKey>ErikM06_parkingsystem</sonar.projectKey>
+		<sonar.organization>erikm06</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+
+	</properties>
 
 	<dependencies>
 		<dependency>
@@ -68,7 +67,27 @@
 			<artifactId>maven-assembly-plugin</artifactId>
 			<version>3.3.0</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-site-plugin</artifactId>
+			<version>3.9.1</version>
+		</dependency>
 	</dependencies>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.9</version>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.4</version>
+			</plugin>
+		</plugins>
+	</reporting>
 
 	<build>
 		<plugins>
@@ -96,16 +115,38 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>3.0.4</version>
+				<configuration>
+					<effort>Max</effort>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.7.1</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.21.0</version>
+				<version>2.22.2</version>
 				<dependencies>
 					<dependency>
 						<groupId>org.junit.platform</groupId>
 						<artifactId>junit-platform-surefire-provider</artifactId>
 						<version>1.2.0</version>
 					</dependency>
+
 				</dependencies>
 				<configuration>
 					<includes>
@@ -152,5 +193,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>

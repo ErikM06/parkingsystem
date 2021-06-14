@@ -37,17 +37,21 @@ public class DiscountServiceForRecurentUser {
 								"Welcome back!  As a recurring user of our parking lot, you'll benefit from a 5% discount.");
 					}
 				}
-			} else if (rs == null) {
+			} else {
 				discount = 0;
 				ticket.setGetDiscount(discount);
 			}
 
 			_dataBaseConfig.closeConnection(con);
-		} catch (Exception e) {
+		}
+	  catch (RuntimeException e) {
+		    throw e;
+		  } 
+		catch (Exception e) {
 
 		}
 	}
-
+	
 	public void applyFivePercentDiscount(Ticket ticket) {
 		double priceWithoutDiscount = 0;
 		double priceWithDiscount = 0;
@@ -62,7 +66,7 @@ public class DiscountServiceForRecurentUser {
 			ticket.setPrice(priceWithDiscount);
 			System.out.println("Price with discount is: " + priceWithDiscount);
 
-		} else {
+		} else {	
 			ticket.getPrice();
 		}
 	}
